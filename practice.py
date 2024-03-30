@@ -17,16 +17,22 @@ music = False
 music1 = False
 
 
-def checkstring(x, button):
+# String does not exceed the Output rect
+def check_string(x, but):
     if len(x) < 20:
-        return x + button
+        return x + but
     return x
-def checksong():
+# If the music variable is true, play music, don't otherwise
+
+
+def check_song():
     global music
     if music:
         pygame.mixer.music.unpause()
     else:
         pygame.mixer.music.pause()
+# Draw text on the screen
+
 
 def draw_text(text, font, rect):
     text_surface = font.render(text, True, "white")  # Render the text onto a surface
@@ -133,7 +139,7 @@ while running:
         # This is the line if there is a click
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             for button in buttons:
-                # If the click does not equal equals, and is a click
+                # If the click does not equal non integer buttons, and is a click
                 if buttons[button].collidepoint(event.pos) and button != "=" and button != "CE" and button != "<>" and button != ">>":
                     # Change the color of the rectangle
                     pygame.draw.rect(screen, after_click, buttons[button])
@@ -141,14 +147,16 @@ while running:
                     if final_answer:
                         string = button
                         final_answer = False
+                    # Make sure the string isn't too long
                     else:
-                        string = checkstring(string, button)
+                        string = check_string(string, button)
+                    # Stall time for the click animation to show
                     time.tick(25)
                     pygame.display.update()
                     continue
             # If the button pressed is the equal sign
             if buttons["="].collidepoint(event.pos):
-                # Replace the normal string into a final string, replacing non operand "human" operators
+                # Replace the normal string into a final string, replacing non operand, "human" operators
                 final_string = string.replace("÷", "/")
                 final_string = final_string.replace("x", "*")
                 # Evaluate the final string and print it
@@ -156,27 +164,34 @@ while running:
                     answer = eval(final_string)
                     string = str(round(float(answer), 3))
                     final_answer = True
+                # If the number exceeds too many characters
                 except OverflowError:
                     string = "big number u suck"
                     final_answer = True
+                # If they typed the numbers/operands in wrong
                 except SyntaxError:
                     string = "u suck"
                     final_answer = True
-
+            # If the button is backspace, remove last element from string
             elif buttons["<>"].collidepoint(event.pos):
                 string = string[:-1]
+            # If the button is CE, remove all elements from string
             elif buttons["CE"].collidepoint(event.pos):
                 string = ""
+            # If the button is Volume, then play music/don't
             elif buttons[">>"].collidepoint(event.pos):
+                # If music variable false make it true
                 if not music:
                     music = True
+                    # If the song hasn't been played yet, then play it and set music1 to True (to pause and unpause)
                     if not music1:
                         pygame.mixer.music.play(loops=-1)
                         music1 = True
-                    checksong()
+                    check_song()
+                # If music variable is True
                 else:
                     music = False
-                    checksong()
+                    check_song()
         # For the first colour change if the mouse was clicked, then it would switch colours.
         # For the next loop, nothing has been clicked, so it will switch back
         elif event.type != pygame.MOUSEBUTTONDOWN:
