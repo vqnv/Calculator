@@ -203,4 +203,4 @@ while running:
         else:
             draw_text(button, font, rect)
     pygame.display.update()
-
+input()
